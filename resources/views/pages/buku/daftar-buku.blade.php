@@ -49,6 +49,7 @@
                         <th>Tahun</th>
                         <th>Harga</th>
                         <th>ISBN</th>
+                        <th>Jumlah Halaman</th>
                         <th>Kategori</th>
                         <th width="180">Aksi</th>
                     </tr>
@@ -76,6 +77,10 @@
                                 <span class="text-dark">
                                     {{ $item->kategori->nama_kategori ?? '-' }}
                                 </span>
+                            </td>
+
+                            <td class="text-center">
+                                {{ $item->detail->jumlah_halaman ?? '-' }}
                             </td>
 
                             <td class="text-center">
