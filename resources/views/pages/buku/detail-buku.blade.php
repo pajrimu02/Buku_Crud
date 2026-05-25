@@ -7,10 +7,11 @@
             <div class="card-header">Detail Buku</div>
             <div class="card-body">
                 <p>Judul Buku: {{ $detailBuku->judul }}</p>
+                <p>ISBN: {{ $detailBuku->detail->isbn ?? '-' }}</p>
                 <p>Penulis: {{ $detailBuku->penulis }}</p>
                 <p>Tahun Terbit: {{ $detailBuku->tahun_terbit }}</p>
                 <p>Harga: {{ $detailBuku->harga }}</p>
-                <p>Kategori: </p>
+                <p>Kategori: {{ $detailBuku->kategori->nama_kategori }}</p>
             </div>
         </div>
     </div>

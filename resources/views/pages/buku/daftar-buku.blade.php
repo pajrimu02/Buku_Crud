@@ -30,6 +30,8 @@
                         <th scope="col">Penulis</th>
                         <th scope="col">Tahun Terbit</th>
                         <th scope="col">Harga</th>
+                        <th scope="col">ISBN</th>
+                        <th scope="col">Kategory</th>
                         <th scope="col" width="25%">Aksi</th>
                     </tr>
                 </thead>
@@ -41,6 +43,8 @@
                             <td>{{ $item->penulis }}</td>
                             <td>{{ $item->tahun_terbit }}</td>
                             <td>{{ $item->harga }}</td>
+                            <td>{{ $item->detail->isbn ?? '-' }}</td>
+                            <td>{{ $item->kategori->nama_kategori ?? '-' }}</td>
                             <td class="text-ceter">
 
                                 <!-- Button trigger modal -->

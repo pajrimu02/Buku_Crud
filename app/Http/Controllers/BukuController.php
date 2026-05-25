@@ -5,20 +5,48 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Buku;
+use App\Models\DetailBuku;
+use App\Models\Kategori;
 
 class BukuController extends Controller
 {
     public function index(Request $request)
     {
+#Cara pertama
+    // detial buku dari buku
+    $detailBuku = Buku::find(1)->detail;
+    // dd($buku->detail->isbn);
+
+    // buku dari detail
+    $detail = DetailBuku::find(3);
+    // dd($detail->buku->judul);
+
+#Cara kedua
+    $buku = Buku::with('detail')->find(1);
+    // dd($buku->detail->isbn ?? '-');
+
 
         $search = $request->keyword;
 
-        $dataBuku = Buku::when($search, function($query, $search){
+        $dataBuku = Buku::with(['detail','kategori'])
+            ->when($search, function($query, $search){
+            // Cari Judul
             return $query->where('judul', 'like', "%{$search}%")
-            ->orWhere('penulis', 'like', "%{$search}%");
+            // Cari Penulis
+            ->orWhere('penulis', 'like', "%{$search}%")
+            // Cari Detial
+            ->orWhereHas('detail', function($q2) use ($search) {
+                $q2->where('isbn', 'like', "%{$search}%");
+            })
+            // Cari Kategori
+            ->orWhereHas('kategori', function($q3) use ($search) {
+                $q3->where('nama_kategori', 'like', "%{$search}%");
+            })
+            // Cari Tahun Terbit
+            ->orWhere('tahun_terbit', 'like', "%{$search}%");
         })
         ->orderBy('id', 'desc')
-        ->paginate(5)
+        ->paginate(10)
         ->withQueryString();
 
         return view('pages.buku.daftar-buku', compact('dataBuku'));
@@ -29,7 +57,9 @@ class BukuController extends Controller
      */
     public function create()
     {
-        return view('pages.buku.form-create');
+        $kategori = Kategori::all();
+        $isbn = '-';
+        return view('pages.buku.form-create', compact('kategori', 'isbn'));
     }
 
     /**
@@ -43,13 +73,19 @@ class BukuController extends Controller
             [
                 'judul' => 'required|min:5',
                 'penulis' => 'required|min:5',
-                'harga' => 'required|numeric',
                 'tahun_terbit' => 'required|numeric',             
+                'harga' => 'required|numeric',
+                'isbn' => 'required|unique:detail_buku,isbn',
+                'kategori_id' => 'required|exists:kategori,id',
             ],
             [
                 'judul.required'=>'waduh judul bukunya jangan dikosongkan ya!',
                 'judul.min'=>'judulnya terlalu pendek, minimal 3 karakter',
-                'penulis.required'=>'setiap buku harus ada nama penulisnya!'
+                'penulis.required'=>'setiap buku harus ada nama penulisnya!',
+                'isbn.required' => 'ISBN harus diisi.',
+                'isbn.unique' => 'ISBN sudah digunakan.',
+                'kategori_id.required' => 'Kategori harus dipilih.',
+                'kategori_id.exists' => 'Kategori yang dipilih tidak valid.',
             ]
         );
         $validated['kategori_id'] = 1;
@@ -81,8 +117,9 @@ class BukuController extends Controller
      */
     public function edit(string $id)
     {
-        $detailBuku = Buku::findOrFail($id);        
-        return view('pages.buku.form-create', compact('detailBuku'));
+        $detailBuku = Buku::with('detail')->findOrFail($id);   
+        $kategori = Kategori::all();
+        return view('pages.buku.form-create', compact('detailBuku', 'kategori'));
     }
 
     /**

@@ -23,7 +23,7 @@ class BukuSeeder extends Seeder
         ]; 
 
         $data = [];
-        for($i=0; $i<7; $i++){
+        for($i=0; $i<50; $i++){
             $data[]= [
                         'judul'         => $faker->randomElement($judulBuku),
                         'penulis'       => $faker->name,

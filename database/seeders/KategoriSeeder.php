@@ -2,27 +2,28 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class KategoriSeeder extends Seeder
 {
-
     public function run(): void
     {
-        $kategori = [
-                        [
-                            'nama_kategori' => 'Multimedia',
-                            'created_at' => now(),
-                            'updated_at'=> now()	
-                        ],
-                        [
-                            'nama_kategori' => 'Database Design',
-                            'created_at' => now(),
-                            'updated_at'=> now()	
-                        ]
+        $kategoriList = [
+            'Multimedia',
+            'Database Design',
+            'Web Programming',
+            'Mobile Development',
+            'Networking',
+            'Artificial Intelligence',
         ];
-        DB::table('kategori')->insert($kategori);
+
+        foreach ($kategoriList as $kategori) {
+            DB::table('kategori')->insert([
+                'nama_kategori' => $kategori,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 }
