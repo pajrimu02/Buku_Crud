@@ -45,11 +45,21 @@
                     <div class="mb-3">
                         <label class="form-label"> ISBN</label>
                         <input type="text" class="form-control" name="isbn"
-                            value="{{ old('isbn', $detailBuku->isbn ?? '') }}">
+                            value="{{ old('isbn', $detailBuku->detail->isbn ?? '') }}"  
                         @error('isbn')
                             <div class="form-text text-danger">{{ $message }}</div>
                         @enderror
                     </div>
+
+                    <!-- Jumlah halaman -->
+                    <div class="mb-3">
+                        <label class="form-label">Jumlah Halaman</label>
+                        <input type="text" class="form-control" name="jumlah_halaman"
+                            value="{{ old('jumlah_halaman', $detailBuku->detail->jumlah_halaman ?? '') }}">
+                        @error('jumlah_halaman')
+                            <div class="form-text text-danger">{{ $message }}</div>
+                        @enderror
+
                     {{-- Penulis --}}
                     <div class="mb-3">
                         <label class="form-label">Penulis Buku</label>

@@ -67,33 +67,47 @@ class BukuController extends Controller
      */
     public function store(Request $request)
     {
-        //dd($request->judul);
-
         $validated = $request->validate(
             [
                 'judul' => 'required|min:5',
                 'penulis' => 'required|min:5',
-                'tahun_terbit' => 'required|numeric',             
+                'tahun_terbit' => 'required|numeric',
                 'harga' => 'required|numeric',
                 'isbn' => 'required|unique:detail_buku,isbn',
                 'kategori_id' => 'required|exists:kategori,id',
+                'jumlah_halaman' => 'required|numeric'
             ],
             [
                 'judul.required'=>'waduh judul bukunya jangan dikosongkan ya!',
                 'judul.min'=>'judulnya terlalu pendek, minimal 3 karakter',
                 'penulis.required'=>'setiap buku harus ada nama penulisnya!',
-                'isbn.required' => 'ISBN harus diisi.',
-                'isbn.unique' => 'ISBN sudah digunakan.',
-                'kategori_id.required' => 'Kategori harus dipilih.',
-                'kategori_id.exists' => 'Kategori yang dipilih tidak valid.',
+                'isbn.required'=>'isbn tidak boleh kosong',
+                'isbn.unique'=>'isbn sudah terdaftar, pastikan isbn yang kamu masukkan belum pernah digunakan sebelumnya',
+                'kategori_id.required'=>'kategori harus dipilih',
+                'kategori_id.exists'=>'kategori yang dipilih tidak valid',
+                'jumlah_halaman.numeric'=>'jumlah halaman harus berupa angka'
             ]
         );
-        $validated['kategori_id'] = 1;
 
-        Buku::create($validated);
+        // simpan buku
+        $buku = Buku::create([
+            'judul' => $validated['judul'],
+            'penulis' => $validated['penulis'],
+            'tahun_terbit' => $validated['tahun_terbit'],
+            'harga' => $validated['harga'],
+            'kategori_id' => $validated['kategori_id'],
+            'jumlah_halaman' => $validated['jumlah_halaman'] 
+        ]);
 
-        return redirect()->route('buku')->with('success', 'Buku baru berhasil ditambahkan');
+        // simpan detail buku
+        DetailBuku::create([
+            'buku_id' => $buku->id,
+            'isbn' => $validated['isbn'],
+            'jumlah_halaman' => $validated['jumlah_halaman'],
+        ]);
 
+        return redirect()->route('buku')
+            ->with('success', 'Buku baru berhasil ditambahkan');
     }
 
     /**
@@ -132,16 +146,39 @@ class BukuController extends Controller
                 'judul' => 'required|min:5',
                 'penulis' => 'required|min:5',
                 'harga' => 'required|numeric',
-                'tahun_terbit' => 'required|numeric',             
-            ],
-            [
+                'tahun_terbit' => 'required|numeric',
+                'isbn' => 'required',
+                'kategori_id' => 'required',
+            ],[
                 'judul.required'=>'waduh judul bukunya jangan dikosongkan ya!',
                 'judul.min'=>'judulnya terlalu pendek, minimal 3 karakter',
-                'penulis.required'=>'setiap buku harus ada nama penulisnya!'
+                'penulis.required'=>'setiap buku harus ada nama penulisnya!',
+                'isbn.required'=>'isbn tidak boleh kosong',
+                'kategori_id.required'=>'kategori harus dipilih',
+                'kategori_id.exists'=>'kategori yang dipilih tidak valid'
             ]
         );
-        Buku::where('id', $id)->update($validated);
-        return redirect()->route('buku')->with('success', 'Data buku berhasil dirubah!');
+
+        $buku = Buku::findOrFail($id);
+
+        // update tabel buku
+        $buku->update([
+            'judul' => $validated['judul'],
+            'penulis' => $validated['penulis'],
+            'harga' => $validated['harga'],
+            'tahun_terbit' => $validated['tahun_terbit'],
+            'kategori_id' => $validated['kategori_id'],
+        ]);
+
+        // update detail buku
+        if ($buku->detail) {
+            $buku->detail->update([
+                'isbn' => $validated['isbn']
+            ]);
+        }
+
+        return redirect()->route('buku')
+            ->with('success', 'Data buku berhasil dirubah!');
     }
 
     /**

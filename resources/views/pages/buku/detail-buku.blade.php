@@ -8,6 +8,7 @@
             <div class="card-body">
                 <p>Judul Buku: {{ $detailBuku->judul }}</p>
                 <p>ISBN: {{ $detailBuku->detail->isbn ?? '-' }}</p>
+                <p>Jumlah Halaman: {{ $detailBuku->detail->jumlah_halaman ?? '-' }}</p>
                 <p>Penulis: {{ $detailBuku->penulis }}</p>
                 <p>Tahun Terbit: {{ $detailBuku->tahun_terbit }}</p>
                 <p>Harga: {{ $detailBuku->harga }}</p>
